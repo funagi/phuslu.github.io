@@ -1,6 +1,7 @@
 <!-- autoindex for nginx, see https://phuslu.github.io -->
 <script>
 !function(){
+	var datetime_format = '%d-%b-%Y %H:%M'
 	var show_readme_md = true
 	var max_name_length = 50
 
@@ -69,6 +70,20 @@
 		displayname = decodeURIComponent(filename.replace(/\/$/, ''))
 		if (displayname.length > max_name_length)
 			displayname = displayname.substring(0, max_name_length-3) + '..>';
+
+		if (!isNaN(Date.parse(datetime))) {
+			d = new Date(datetime)
+			pad = function (s) {return s < 10 ? '0' + s : s}
+			mon = function (m) {return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m]}
+			datetime = datetime_format
+					.replace('%Y', d.getFullYear())
+					.replace('%m', pad(d.getMonth()+1))
+					.replace('%d', pad(d.getDay()+1))
+					.replace('%H', pad(d.getHours()))
+					.replace('%M', pad(d.getMinutes()))
+					.replace('%S', pad(d.getSeconds()))
+					.replace('%b', mon(d.getMonth()))
+		}
 
 		tr = tbody.add('tr')
 		tr.add('td').add('a').attr('class', 'octicon ' + css).attr('href', filename).text(displayname)
