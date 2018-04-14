@@ -40,6 +40,7 @@ function __($message) {
 		'Total Space' => '总空间',
 		'Disk Usage' => '硬盘使用状况',
 		'Loadavg' => '系统平均负载',
+		'Sockets' => '网络连接数',
 		'Network Usage' => '网络使用状况',
 		'Tx' => '出网',
 		'Rx' => '入网',
@@ -119,6 +120,24 @@ function get_stat()
 	$array = array_shift($content);
 	$array = preg_split('/\s+/', trim($array));
 	return array_slice($array, 1);
+}
+
+function get_sockstat()
+{
+	$info = array();
+
+	$content = file('/proc/net/sockstat');
+	foreach ($content as $line) {
+		$parts = explode(':', $line);
+		$key = trim($parts[0]);
+		$values = preg_split('/\s+/', trim($parts[1]));
+		$info[$key] = array();
+		for ($i = 0; $i < count($info); $i += 2) {
+			$info[$key][$values[$i]] = $values[$i+1];
+		}
+	}
+
+	return $info;
 }
 
 function get_ip_location_cn($ip)
@@ -498,6 +517,7 @@ switch ($_GET['method']) {
 			'tempinfo' => get_tempinfo(),
 			'meminfo' => get_meminfo(),
 			'loadavg' => get_loadavg(),
+			'sockstat' => get_sockstat(),
 			'diskinfo' => get_diskinfo(),
 			'netdev' => get_netdev(),
 		));
@@ -517,6 +537,7 @@ $cpuinfo = get_cpuinfo();
 $tempinfo = get_tempinfo();
 $meminfo = get_meminfo();
 $loadavg = get_loadavg();
+$sockstat = get_sockstat();
 $boardinfo = get_boardinfo();
 $diskinfo = get_diskinfo();
 $netdev = get_netdev();
@@ -699,6 +720,9 @@ body {
 	<tr>
 	<td><?php __('Loadavg'); ?></td>
 	<td colspan="3" class="text-danger"><span id="loadAvg"><?php echo $loadavg;?></span></td>
+	</tr>
+	<td><?php __('Sockets'); ?></td>
+	<td colspan="3"><span id="sockets"><?php echo $sockstat['sockets']['used'];?></span></td>
 	</tr>
 </table>
 
@@ -948,6 +972,7 @@ function getSysinfo() {
 		$('#diskinfo_UsedBar').width(data.diskinfo.diskPercent)
 
 		$('#loadAvg').html(data.loadavg)
+		$('#sockets').html(data.sockstat.sockets.used)
 
 		for (var dev in netdev) {
 			var info = netdev[dev]
