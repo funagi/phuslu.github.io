@@ -393,9 +393,9 @@ function get_diskinfo()
 {
 	$info = array();
 
-	$info['diskTotal'] = round(@disk_total_space('.')/(1024*1024*1024),3);
-	$info['diskFree'] = round(@disk_free_space('.')/(1024*1024*1024),3);
-	$info['diskUsed'] = $info['diskTotal'] - $info['diskFree'];
+	$info['diskTotal'] = round(@disk_total_space('.')/(1024*1024*1024),2);
+	$info['diskFree'] = round(@disk_free_space('.')/(1024*1024*1024),2);
+	$info['diskUsed'] = round($info['diskTotal'] - $info['diskFree'],2);
 	$info['diskPercent'] = 0;
 	if (floatval($info['diskTotal']) != 0)
 		$info['diskPercent'] = round($info['diskUsed']/$info['diskTotal']*100, 2);
